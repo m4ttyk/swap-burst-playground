@@ -833,13 +833,9 @@
       $("rate").textContent = "1 " + cfg.assetFrom + " = 0.000292 " + cfg.assetTo;
       $("balFrom").textContent = "Balance: 1,204.50 " + cfg.assetFrom;
 
-      const json = {
-        count: cfg.count, power: cfg.power, spread: cfg.spread, direction: cfg.direction,
-        gravity: cfg.gravity, drag: cfg.drag, size: cfg.size,
-        scaleTo: cfg.scaleTo, scaleDuration: cfg.scaleDuration, life: cfg.life,
-        fadeAt: cfg.fadeAt, rotSpeed: cfg.rotSpeed, stagger: cfg.stagger, shake: cfg.shake,
-        origin: cfg.origin,
-      };
+      const json = {};
+      for (const s of SLIDERS) json[s.key] = cfg[s.key];
+      json.origin = cfg.origin;
       out.value = JSON.stringify(json, null, 2);
     }
 
