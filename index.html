@@ -678,6 +678,8 @@
       { key: "gravity",   label: "Gravity",             min: 0,  max: 1.6, step: 0.01, unit: "" },
       { key: "drag",      label: "Drag / air resistance", min: 0, max: 0.12, step: 0.002, unit: "" },
       { key: "size",      label: "Particle size",       min: 8,  max: 48,  step: 1,    unit: "px" },
+      { key: "scaleTo",   label: "Scale to (1 = no growth)", min: 0.2, max: 3, step: 0.05, unit: "×" },
+      { key: "scaleDuration", label: "Scale duration", min: 0, max: 4000, step: 25, unit: "ms", zeroLabel: "whole life" },
       { key: "life",      label: "Lifetime",            min: 200, max: 4000, step: 25, unit: "ms" },
       { key: "fadeAt",    label: "Fade-out portion of life", min: 0.05, max: 1, step: 0.01, unit: "" },
       { key: "rotSpeed",  label: "Rotation speed (± °/frame)", min: 0, max: 40, step: 0.5, unit: "" },
@@ -690,31 +692,43 @@
         blurb: "few, small, quick",
         count: 12, power: 8, spread: 38, direction: 0, gravity: 0.55, drag: 0.01,
         size: 16, life: 900, fadeAt: 0.5, rotSpeed: 8, stagger: 0, shake: 0, origin: "center",
+        scaleTo: 1, scaleDuration: 0,
       },
       Classic: {
         blurb: "reference numbers",
         count: 40, power: 12, spread: 55, direction: 0, gravity: 0.6, drag: 0,
         size: 20, life: 1500, fadeAt: 0.25, rotSpeed: 14, stagger: 0, shake: 0, origin: "center",
+        scaleTo: 1, scaleDuration: 0,
       },
       Fountain: {
         blurb: "narrow, high, long",
         count: 60, power: 20, spread: 18, direction: 0, gravity: 0.9, drag: 0.006,
         size: 22, life: 2600, fadeAt: 0.3, rotSpeed: 10, stagger: 260, shake: 4, origin: "width",
+        scaleTo: 1, scaleDuration: 0,
       },
       Pop: {
         blurb: "omni, dense, fast",
         count: 120, power: 16, spread: 90, direction: 1, gravity: 0.35, drag: 0.05,
         size: 18, life: 800, fadeAt: 0.6, rotSpeed: 26, stagger: 0, shake: 8, origin: "center",
+        scaleTo: 1, scaleDuration: 0,
       },
       Splash: {
         blurb: "two edges, wide arc",
         count: 44, power: 15, spread: 45, direction: 0.25, gravity: 0.8, drag: 0.008,
         size: 24, life: 1800, fadeAt: 0.35, rotSpeed: 18, stagger: 120, shake: 6, origin: "edges",
+        scaleTo: 1, scaleDuration: 0,
       },
       Drift: {
         blurb: "slow, floaty, heavy drag",
         count: 26, power: 9, spread: 70, direction: 0.45, gravity: 0.12, drag: 0.07,
         size: 26, life: 3000, fadeAt: 0.7, rotSpeed: 5, stagger: 400, shake: 0, origin: "width",
+        scaleTo: 1, scaleDuration: 0,
+      },
+      Bloom: {
+        blurb: "grows 1s, holds 1s",
+        count: 30, power: 13, spread: 50, direction: 0.15, gravity: 0.5, drag: 0.02,
+        size: 14, life: 2000, fadeAt: 0.45, rotSpeed: 7, stagger: 150, shake: 3, origin: "center",
+        scaleTo: 2.2, scaleDuration: 1000,
       },
     };
 
@@ -806,7 +820,9 @@
       for (const key of Object.keys(sliderEls)) {
         const { val, spec } = sliderEls[key];
         const n = cfg[key];
-        val.textContent = (spec.step < 1 ? n.toFixed(spec.step < 0.01 ? 3 : 2) : String(n)) + spec.unit;
+        val.textContent = spec.zeroLabel && n === 0
+          ? spec.zeroLabel
+          : (spec.step < 1 ? n.toFixed(spec.step < 0.01 ? 3 : 2) : String(n)) + spec.unit;
       }
       for (const b of originButtons) b.setAttribute("aria-pressed", String(b.dataset.v === cfg.origin));
 
@@ -819,7 +835,8 @@
 
       const json = {
         count: cfg.count, power: cfg.power, spread: cfg.spread, direction: cfg.direction,
-        gravity: cfg.gravity, drag: cfg.drag, size: cfg.size, life: cfg.life,
+        gravity: cfg.gravity, drag: cfg.drag, size: cfg.size,
+        scaleTo: cfg.scaleTo, scaleDuration: cfg.scaleDuration, life: cfg.life,
         fadeAt: cfg.fadeAt, rotSpeed: cfg.rotSpeed, stagger: cfg.stagger, shake: cfg.shake,
         origin: cfg.origin,
       };
@@ -1047,8 +1064,16 @@
         const fadeWindow = p.life0 * cfg.fadeAt;
         const fade = p.life < fadeWindow ? Math.max(0, p.life / fadeWindow) : 1;
         p.el.style.opacity = String(fade);
+
+        const growFrames = cfg.scaleDuration > 0
+          ? Math.min(cfg.scaleDuration / FRAME, p.life0)
+          : p.life0;
+        const grown = Math.min(1, (p.life0 - p.life) / growFrames);
+        const scale = 1 + (cfg.scaleTo - 1) * grown;
+
         p.el.style.transform =
-          "translate(" + p.x.toFixed(2) + "px, " + p.y.toFixed(2) + "px) rotate(" + p.rot.toFixed(1) + "deg)";
+          "translate(" + p.x.toFixed(2) + "px, " + p.y.toFixed(2) + "px) rotate(" + p.rot.toFixed(1) + "deg)" +
+          (scale === 1 ? "" : " scale(" + scale.toFixed(3) + ")");
       }
 
       counter.textContent = particles.length + " particles";
