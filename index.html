@@ -1,0 +1,1156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Swap CTA celebration burst — tuning playground</title>
+<style>*,*::before,*::after{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0}</style>
+</head>
+<body>
+<style>
+  :root {
+    color-scheme: light dark;
+
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface-2: #f6f7f9;
+    --surface-3: #eceef2;
+    --stage-bg: #e9ebf0;
+    --border: #e2e5ea;
+    --border-strong: #cdd2da;
+    --text: #10131a;
+    --text-2: #5b6472;
+    --text-3: #8a93a1;
+    --accent: #3363ff;
+    --accent-text: #ffffff;
+    --success: #12a05c;
+    --success-soft: #e6f6ee;
+    --danger: #c0322b;
+    --shadow: 0 1px 2px rgba(16, 19, 26, 0.06), 0 12px 32px rgba(16, 19, 26, 0.08);
+    --shadow-card: 0 2px 6px rgba(16, 19, 26, 0.06), 0 24px 60px rgba(16, 19, 26, 0.12);
+    --track: #d8dce3;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0c0e13;
+      --surface: #16191f;
+      --surface-2: #1c2029;
+      --surface-3: #232833;
+      --stage-bg: #101319;
+      --border: #262b35;
+      --border-strong: #363d4a;
+      --text: #f2f4f8;
+      --text-2: #a3acbb;
+      --text-3: #737d8d;
+      --accent: #5b83ff;
+      --accent-text: #0a0c11;
+      --success: #35c987;
+      --success-soft: #102a1f;
+      --danger: #ff7b72;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 12px 32px rgba(0, 0, 0, 0.45);
+      --shadow-card: 0 2px 6px rgba(0, 0, 0, 0.5), 0 24px 60px rgba(0, 0, 0, 0.6);
+      --track: #333a46;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0c0e13;
+    --surface: #16191f;
+    --surface-2: #1c2029;
+    --surface-3: #232833;
+    --stage-bg: #101319;
+    --border: #262b35;
+    --border-strong: #363d4a;
+    --text: #f2f4f8;
+    --text-2: #a3acbb;
+    --text-3: #737d8d;
+    --accent: #5b83ff;
+    --accent-text: #0a0c11;
+    --success: #35c987;
+    --success-soft: #102a1f;
+    --danger: #ff7b72;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 12px 32px rgba(0, 0, 0, 0.45);
+    --shadow-card: 0 2px 6px rgba(0, 0, 0, 0.5), 0 24px 60px rgba(0, 0, 0, 0.6);
+    --track: #333a46;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 20px 64px;
+  }
+
+  header.top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 10px 16px;
+    margin-bottom: 6px;
+  }
+  header.top h1 {
+    font-size: 20px;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .subtitle { color: var(--text-2); margin: 0 0 18px; max-width: 70ch; }
+  .disclaimer {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-2);
+    font-size: 12.5px;
+    margin-bottom: 20px;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 999px; background: var(--accent); flex: none; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 940px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  /* ---------- stage ---------- */
+
+  #stage {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 90% at 50% 8%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 62%),
+      var(--stage-bg);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    min-height: 640px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 40px 20px 32px;
+  }
+
+  #layer {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+  }
+  #layer img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    will-change: transform, opacity;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .phone {
+    position: relative;
+    z-index: 2;
+    width: 390px;
+    max-width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 26px;
+    box-shadow: var(--shadow-card);
+    padding: 18px 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .phone-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 2px 0;
+  }
+  .phone-head .title { font-weight: 620; font-size: 16px; letter-spacing: -0.01em; }
+  .chip {
+    font-size: 12px;
+    color: var(--text-2);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 4px 10px;
+  }
+
+  .rows { position: relative; display: flex; flex-direction: column; gap: 8px; }
+
+  .row {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .row .row-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    color: var(--text-3);
+  }
+  .row .row-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .asset {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 12px 6px 6px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+  .asset img { width: 26px; height: 26px; display: block; }
+  .amount {
+    font-size: 26px;
+    font-weight: 640;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .amount.muted { color: var(--text-2); }
+
+  .flip {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    color: var(--text-2);
+    display: grid;
+    place-items: center;
+    z-index: 2;
+    cursor: pointer;
+  }
+
+  .meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 4px;
+    font-size: 12.5px;
+    color: var(--text-2);
+  }
+  .meta .line { display: flex; justify-content: space-between; }
+  .meta .line strong { color: var(--text); font-weight: 560; }
+
+  #cta {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 54px;
+    border: none;
+    border-radius: 14px;
+    background: var(--accent);
+    color: var(--accent-text);
+    font: inherit;
+    font-size: 16px;
+    font-weight: 640;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 220ms ease, color 220ms ease;
+  }
+  #cta[data-state="done"] { background: var(--success); color: #ffffff; }
+  #cta .check {
+    width: 0;
+    height: 20px;
+    opacity: 0;
+    transform: scale(0.4);
+    transition: width 200ms ease, opacity 200ms ease, transform 260ms cubic-bezier(.2,1.5,.4,1);
+  }
+  #cta[data-state="done"] .check { width: 20px; opacity: 1; transform: scale(1); }
+
+  .stage-tools {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    right: 14px;
+    z-index: 4;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .stage-tools .spacer { flex: 1; }
+
+  button.ghost {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 550;
+    padding: 7px 13px;
+    border-radius: 10px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+  }
+  button.ghost:hover { background: var(--surface-3); }
+  button.ghost[aria-pressed="true"] {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .counter {
+    font-size: 12px;
+    color: var(--text-2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 11px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- controls ---------- */
+
+  .controls { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+
+  .group { display: flex; flex-direction: column; gap: 10px; }
+  .group > h2 {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 640;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .presets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .presets button { text-align: left; }
+  .presets button small { display: block; font-weight: 450; color: var(--text-3); font-size: 11.5px; }
+
+  .ctl { display: flex; flex-direction: column; gap: 5px; }
+  .ctl .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 13px;
+  }
+  .ctl .head .val {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-2);
+    font-size: 12.5px;
+  }
+  .ctl .hint { font-size: 11.5px; color: var(--text-3); }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 18px;
+    background: transparent;
+    margin: 0;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--track);
+  }
+  input[type="range"]::-moz-range-track {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--track);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    margin-top: -6px;
+    border-radius: 999px;
+    background: var(--accent);
+    border: 2px solid var(--surface);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    background: var(--accent);
+    border: 2px solid var(--surface);
+    cursor: pointer;
+  }
+
+  .seg { display: flex; gap: 6px; }
+  .seg button { flex: 1; text-align: center; padding: 7px 8px; font-size: 12.5px; }
+
+  .assets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  select {
+    font: inherit;
+    font-size: 13px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text);
+    width: 100%;
+  }
+
+  .toggles { display: flex; flex-direction: column; gap: 8px; }
+  label.toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--accent); cursor: pointer; }
+
+  textarea {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.55;
+    width: 100%;
+    min-height: 232px;
+    resize: vertical;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+  }
+
+  .copy-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .copy-row .status { font-size: 12px; color: var(--text-3); flex: 1 1 100%; }
+  .copy-row .status[data-tone="error"] { color: var(--danger); }
+
+  #in { min-height: 96px; }
+  #in::placeholder { color: var(--text-3); }
+
+  label.filebtn { position: relative; overflow: hidden; display: inline-flex; }
+  label.filebtn input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    font-size: 0;
+  }
+
+  .reduced-note {
+    display: none;
+    font-size: 12.5px;
+    color: var(--text-2);
+    background: var(--surface-2);
+    border: 1px dashed var(--border-strong);
+    border-radius: 10px;
+    padding: 8px 10px;
+  }
+  body[data-reduced="true"] .reduced-note { display: block; }
+</style>
+
+<div class="page">
+  <header class="top">
+    <h1>Swap CTA celebration burst</h1>
+    <span class="chip">tuning playground — not shipped code</span>
+  </header>
+  <p class="subtitle">
+    Press the CTA (or Replay) to fire the burst. Tune with the sliders, then copy the JSON at the bottom
+    right — that object is the whole deliverable.
+  </p>
+  <div class="disclaimer">
+    <span class="dot"></span>
+    Token icons are hand-drawn SVG stand-ins, not production art. The real implementation feeds the actual
+    asset icon URLs.
+  </div>
+
+  <div class="layout">
+    <section id="stage" class="panel">
+      <div class="stage-tools">
+        <button class="ghost" id="replay" type="button">Replay burst</button>
+        <button class="ghost" id="reset" type="button">Reset CTA</button>
+        <span class="spacer"></span>
+        <span class="counter" id="counter">0 particles</span>
+        <button class="ghost" id="theme" type="button">Theme: system</button>
+      </div>
+
+      <div id="layer" aria-hidden="true"></div>
+
+      <div class="phone">
+        <div class="phone-head">
+          <span class="title">Swap</span>
+          <span class="chip">Ramp Wallet</span>
+        </div>
+
+        <div class="rows">
+          <div class="row">
+            <div class="row-label"><span>You pay</span><span id="balFrom">Balance: 1,204.50</span></div>
+            <div class="row-main">
+              <span class="asset"><img id="iconFrom" alt="" /><span id="symFrom">USDC</span></span>
+              <span class="amount" id="amtFrom">250.00</span>
+            </div>
+          </div>
+
+          <button class="flip" id="flip" type="button" aria-label="Swap assets">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M7 20l-3-3M17 20V4M17 4l3 3"/></svg>
+          </button>
+
+          <div class="row">
+            <div class="row-label"><span>You receive</span><span>Est.</span></div>
+            <div class="row-main">
+              <span class="asset"><img id="iconTo" alt="" /><span id="symTo">ETH</span></span>
+              <span class="amount muted" id="amtTo">0.0731</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="meta">
+          <div class="line"><span>Rate</span><strong id="rate">1 USDC = 0.000292 ETH</strong></div>
+          <div class="line"><span>Network fee</span><strong>$0.41</strong></div>
+          <div class="line"><span>Ramp fee</span><strong>$1.24</strong></div>
+        </div>
+
+        <button id="cta" type="button" data-state="idle">
+          <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5l5.2 5.2L20 7"/></svg>
+          <span id="ctaLabel">Swap</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="panel controls">
+      <div class="group">
+        <h2>Presets</h2>
+        <div class="presets" id="presets"></div>
+      </div>
+
+      <div class="group">
+        <h2>Assets</h2>
+        <div class="assets">
+          <select id="selFrom" aria-label="From asset"></select>
+          <select id="selTo" aria-label="To asset"></select>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>Burst</h2>
+        <div id="sliders"></div>
+      </div>
+
+      <div class="group">
+        <h2>Emit origin</h2>
+        <div class="seg" id="origin">
+          <button class="ghost" type="button" data-v="center">Centre</button>
+          <button class="ghost" type="button" data-v="width">Full width</button>
+          <button class="ghost" type="button" data-v="edges">Two edges</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>Options</h2>
+        <div class="toggles">
+          <label class="toggle"><span>Reduced motion (no flight, soft fade)</span><input type="checkbox" id="reduced" /></label>
+          <label class="toggle"><span>Auto-replay every 2.5s</span><input type="checkbox" id="auto" /></label>
+        </div>
+        <div class="reduced-note">
+          Reduced-motion variant active: particles fade in place around the CTA instead of flying, and the
+          button does not shake.
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>Config out</h2>
+        <textarea id="out" readonly spellcheck="false"></textarea>
+        <div class="copy-row">
+          <button class="ghost" id="copy" type="button">Copy JSON</button>
+          <span class="status" id="copyStatus"></span>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>Config in</h2>
+        <textarea id="in" spellcheck="false" placeholder='Paste a config here, e.g. {"count": 60, "power": 18}'></textarea>
+        <div class="copy-row">
+          <button class="ghost" id="apply" type="button">Apply</button>
+          <label class="ghost filebtn">Load .json<input type="file" id="file" accept="application/json,.json" /></label>
+          <span class="status" id="importStatus"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  (function () {
+    "use strict";
+
+    /* ---------- hand-drawn token stand-ins ---------- */
+
+    const TOKENS = {
+      USDC: { name: "USDC", bg: "#2775ca", fg: "#ffffff", glyph: "$" },
+      ETH:  { name: "ETH",  bg: "#3c3c3d", fg: "#ffffff", glyph: "diamond" },
+      BTC:  { name: "BTC",  bg: "#f7931a", fg: "#ffffff", glyph: "B" },
+      SOL:  { name: "SOL",  bg: "#111827", fg: "#14f195", glyph: "bars" },
+      USDT: { name: "USDT", bg: "#26a17b", fg: "#ffffff", glyph: "T" },
+      MATIC:{ name: "MATIC",bg: "#8247e5", fg: "#ffffff", glyph: "hex" },
+    };
+
+    function tokenSvg(key) {
+      const t = TOKENS[key];
+      let inner;
+      if (t.glyph === "diamond") {
+        inner =
+          '<path d="M32 12 46 33 32 41 18 33Z" fill="' + t.fg + '" opacity="0.95"/>' +
+          '<path d="M32 44 46 36 32 54 18 36Z" fill="' + t.fg + '" opacity="0.7"/>';
+      } else if (t.glyph === "bars") {
+        inner =
+          '<path d="M20 24h22l-6 6H14z" fill="' + t.fg + '"/>' +
+          '<path d="M20 34h22l-6 6H14z" fill="' + t.fg + '" opacity="0.85"/>' +
+          '<path d="M20 44h22l-6 6H14z" fill="' + t.fg + '" opacity="0.7"/>';
+      } else if (t.glyph === "hex") {
+        inner =
+          '<path d="M32 16 46 24v16l-14 8-14-8V24Z" fill="none" stroke="' + t.fg + '" stroke-width="5"/>';
+      } else {
+        inner =
+          '<text x="32" y="45" font-family="Helvetica,Arial,sans-serif" font-size="34" font-weight="700"' +
+          ' text-anchor="middle" fill="' + t.fg + '">' + t.glyph + "</text>";
+      }
+      return (
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">' +
+        '<circle cx="32" cy="32" r="31" fill="' + t.bg + '"/>' +
+        '<circle cx="32" cy="32" r="31" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="2"/>' +
+        inner +
+        "</svg>"
+      );
+    }
+
+    const ICON = {};
+    for (const k of Object.keys(TOKENS)) {
+      ICON[k] = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(tokenSvg(k));
+    }
+
+    /* ---------- config ---------- */
+
+    const SLIDERS = [
+      { key: "count",     label: "Particle count",     min: 4,   max: 200, step: 1,    unit: "" },
+      { key: "power",     label: "Power (initial speed)", min: 2, max: 30, step: 0.5,  unit: "" },
+      { key: "spread",    label: "Spread (cone °)",     min: 0,  max: 90,  step: 1,    unit: "°" },
+      { key: "direction", label: "Direction: fountain → 360° pop", min: 0, max: 1, step: 0.01, unit: "" },
+      { key: "gravity",   label: "Gravity",             min: 0,  max: 1.6, step: 0.01, unit: "" },
+      { key: "drag",      label: "Drag / air resistance", min: 0, max: 0.12, step: 0.002, unit: "" },
+      { key: "size",      label: "Particle size",       min: 8,  max: 48,  step: 1,    unit: "px" },
+      { key: "life",      label: "Lifetime",            min: 200, max: 4000, step: 25, unit: "ms" },
+      { key: "fadeAt",    label: "Fade-out portion of life", min: 0.05, max: 1, step: 0.01, unit: "" },
+      { key: "rotSpeed",  label: "Rotation speed (± °/frame)", min: 0, max: 40, step: 0.5, unit: "" },
+      { key: "stagger",   label: "Stagger (emit over)", min: 0,  max: 900, step: 10,   unit: "ms" },
+      { key: "shake",     label: "Button shake",        min: 0,  max: 14,  step: 0.5,  unit: "px" },
+    ];
+
+    const PRESETS = {
+      Subtle: {
+        blurb: "few, small, quick",
+        count: 12, power: 8, spread: 38, direction: 0, gravity: 0.55, drag: 0.01,
+        size: 16, life: 900, fadeAt: 0.5, rotSpeed: 8, stagger: 0, shake: 0, origin: "center",
+      },
+      Classic: {
+        blurb: "reference numbers",
+        count: 40, power: 12, spread: 55, direction: 0, gravity: 0.6, drag: 0,
+        size: 20, life: 1500, fadeAt: 0.25, rotSpeed: 14, stagger: 0, shake: 0, origin: "center",
+      },
+      Fountain: {
+        blurb: "narrow, high, long",
+        count: 60, power: 20, spread: 18, direction: 0, gravity: 0.9, drag: 0.006,
+        size: 22, life: 2600, fadeAt: 0.3, rotSpeed: 10, stagger: 260, shake: 4, origin: "width",
+      },
+      Pop: {
+        blurb: "omni, dense, fast",
+        count: 120, power: 16, spread: 90, direction: 1, gravity: 0.35, drag: 0.05,
+        size: 18, life: 800, fadeAt: 0.6, rotSpeed: 26, stagger: 0, shake: 8, origin: "center",
+      },
+      Splash: {
+        blurb: "two edges, wide arc",
+        count: 44, power: 15, spread: 45, direction: 0.25, gravity: 0.8, drag: 0.008,
+        size: 24, life: 1800, fadeAt: 0.35, rotSpeed: 18, stagger: 120, shake: 6, origin: "edges",
+      },
+      Drift: {
+        blurb: "slow, floaty, heavy drag",
+        count: 26, power: 9, spread: 70, direction: 0.45, gravity: 0.12, drag: 0.07,
+        size: 26, life: 3000, fadeAt: 0.7, rotSpeed: 5, stagger: 400, shake: 0, origin: "width",
+      },
+    };
+
+    const cfg = Object.assign({ assetFrom: "USDC", assetTo: "ETH" }, PRESETS.Classic);
+    delete cfg.blurb;
+
+    /* ---------- dom ---------- */
+
+    const $ = (id) => document.getElementById(id);
+    const stage = $("stage");
+    const layer = $("layer");
+    const cta = $("cta");
+    const ctaLabel = $("ctaLabel");
+    const counter = $("counter");
+    const out = $("out");
+    const reducedBox = $("reduced");
+
+    /* ---------- controls ---------- */
+
+    const sliderEls = {};
+    const slidersRoot = $("sliders");
+    for (const s of SLIDERS) {
+      const wrap = document.createElement("div");
+      wrap.className = "ctl";
+      wrap.innerHTML =
+        '<div class="head"><label for="s-' + s.key + '">' + s.label + '</label>' +
+        '<span class="val" id="v-' + s.key + '"></span></div>' +
+        '<input type="range" id="s-' + s.key + '" min="' + s.min + '" max="' + s.max +
+        '" step="' + s.step + '" />';
+      slidersRoot.appendChild(wrap);
+      const input = wrap.querySelector("input");
+      const val = wrap.querySelector(".val");
+      sliderEls[s.key] = { input, val, spec: s };
+      input.addEventListener("input", () => {
+        cfg[s.key] = parseFloat(input.value);
+        syncValues();
+      });
+    }
+
+    const presetsRoot = $("presets");
+    for (const name of Object.keys(PRESETS)) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "ghost";
+      b.innerHTML = name + "<small>" + PRESETS[name].blurb + "</small>";
+      b.addEventListener("click", () => {
+        const p = PRESETS[name];
+        for (const k of Object.keys(p)) {
+          if (k !== "blurb") cfg[k] = p[k];
+        }
+        syncControls();
+        fire(true);
+      });
+      presetsRoot.appendChild(b);
+    }
+
+    const originButtons = Array.from($("origin").querySelectorAll("button"));
+    for (const b of originButtons) {
+      b.addEventListener("click", () => {
+        cfg.origin = b.dataset.v;
+        syncValues();
+      });
+    }
+
+    const selFrom = $("selFrom");
+    const selTo = $("selTo");
+    for (const k of Object.keys(TOKENS)) {
+      selFrom.appendChild(new Option(k, k));
+      selTo.appendChild(new Option(k, k));
+    }
+    selFrom.addEventListener("change", () => { cfg.assetFrom = selFrom.value; syncValues(); });
+    selTo.addEventListener("change", () => { cfg.assetTo = selTo.value; syncValues(); });
+
+    $("flip").addEventListener("click", () => {
+      const a = cfg.assetFrom;
+      cfg.assetFrom = cfg.assetTo;
+      cfg.assetTo = a;
+      syncControls();
+    });
+
+    function syncControls() {
+      for (const key of Object.keys(sliderEls)) sliderEls[key].input.value = cfg[key];
+      selFrom.value = cfg.assetFrom;
+      selTo.value = cfg.assetTo;
+      syncValues();
+    }
+
+    function syncValues() {
+      for (const key of Object.keys(sliderEls)) {
+        const { val, spec } = sliderEls[key];
+        const n = cfg[key];
+        val.textContent = (spec.step < 1 ? n.toFixed(spec.step < 0.01 ? 3 : 2) : String(n)) + spec.unit;
+      }
+      for (const b of originButtons) b.setAttribute("aria-pressed", String(b.dataset.v === cfg.origin));
+
+      $("iconFrom").src = ICON[cfg.assetFrom];
+      $("iconTo").src = ICON[cfg.assetTo];
+      $("symFrom").textContent = cfg.assetFrom;
+      $("symTo").textContent = cfg.assetTo;
+      $("rate").textContent = "1 " + cfg.assetFrom + " = 0.000292 " + cfg.assetTo;
+      $("balFrom").textContent = "Balance: 1,204.50 " + cfg.assetFrom;
+
+      const json = {
+        count: cfg.count, power: cfg.power, spread: cfg.spread, direction: cfg.direction,
+        gravity: cfg.gravity, drag: cfg.drag, size: cfg.size, life: cfg.life,
+        fadeAt: cfg.fadeAt, rotSpeed: cfg.rotSpeed, stagger: cfg.stagger, shake: cfg.shake,
+        origin: cfg.origin,
+      };
+      out.value = JSON.stringify(json, null, 2);
+    }
+
+    $("copy").addEventListener("click", () => {
+      out.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      $("copyStatus").textContent = ok ? "copied" : "select + ⌘C";
+      setTimeout(() => { $("copyStatus").textContent = ""; }, 1600);
+    });
+
+    /* ---------- config import ---------- */
+
+    const ORIGINS = ["center", "width", "edges"];
+    const importStatus = $("importStatus");
+
+    function setImportStatus(msg, isError) {
+      importStatus.textContent = msg;
+      importStatus.dataset.tone = isError ? "error" : "ok";
+    }
+
+    function coerce(spec, raw) {
+      if (raw === null || typeof raw === "boolean") return null;
+      if (typeof raw !== "number" && typeof raw !== "string") return null;
+      if (typeof raw === "string" && raw.trim() === "") return null;
+      const n = Number(raw);
+      if (!isFinite(n)) return null;
+      const snapped = spec.min + Math.round((n - spec.min) / spec.step) * spec.step;
+      const clamped = Math.min(spec.max, Math.max(spec.min, snapped));
+      const value = parseFloat(clamped.toFixed(6));
+      return { value: value, adjusted: value !== n };
+    }
+
+    function applyConfig(text) {
+      let parsed;
+      try {
+        parsed = JSON.parse(text);
+      } catch (e) {
+        setImportStatus("Not valid JSON — nothing changed.", true);
+        return;
+      }
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        setImportStatus("Expected a JSON object — nothing changed.", true);
+        return;
+      }
+
+      const next = {};
+      let applied = 0;
+      let adjusted = 0;
+      let ignored = 0;
+
+      for (const key of Object.keys(parsed)) {
+        if (key === "origin") {
+          if (ORIGINS.indexOf(parsed.origin) === -1) { ignored++; continue; }
+          next.origin = parsed.origin;
+          applied++;
+          continue;
+        }
+        const entry = sliderEls[key];
+        if (!entry) { ignored++; continue; }
+        const r = coerce(entry.spec, parsed[key]);
+        if (!r) { ignored++; continue; }
+        if (r.adjusted) adjusted++;
+        next[key] = r.value;
+        applied++;
+      }
+
+      if (!applied) {
+        setImportStatus("No usable keys — nothing changed.", true);
+        return;
+      }
+
+      Object.assign(cfg, next);
+      syncControls();
+      fire(true);
+
+      const notes = [];
+      if (adjusted) notes.push(adjusted + " snapped to slider range");
+      if (ignored) notes.push(ignored + " ignored");
+      setImportStatus(
+        "Applied " + applied + (applied === 1 ? " value" : " values") +
+          (notes.length ? " (" + notes.join(", ") + ")." : "."),
+        false
+      );
+    }
+
+    $("apply").addEventListener("click", () => applyConfig($("in").value));
+
+    $("file").addEventListener("change", (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (f) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          $("in").value = String(reader.result);
+          applyConfig($("in").value);
+        };
+        reader.onerror = () => setImportStatus("Could not read that file.", true);
+        reader.readAsText(f);
+      }
+      e.target.value = "";
+    });
+
+    /* ---------- theme toggle ---------- */
+
+    const themeOrder = ["system", "light", "dark"];
+    let themeIdx = 0;
+    $("theme").addEventListener("click", () => {
+      themeIdx = (themeIdx + 1) % themeOrder.length;
+      const t = themeOrder[themeIdx];
+      if (t === "system") document.documentElement.removeAttribute("data-theme");
+      else document.documentElement.setAttribute("data-theme", t);
+      $("theme").textContent = "Theme: " + t;
+    });
+
+    /* ---------- particle engine ---------- */
+
+    const FRAME = 1000 / 60;
+    const HARD_CAP = 240;
+    const particles = [];
+    const pending = [];
+    const pool = [];
+    let raf = 0;
+    let lastTs = 0;
+
+    function acquireEl() {
+      const el = pool.pop() || document.createElement("img");
+      el.setAttribute("aria-hidden", "true");
+      el.alt = "";
+      layer.appendChild(el);
+      return el;
+    }
+
+    function releaseEl(el) {
+      el.remove();
+      if (pool.length < HARD_CAP) pool.push(el);
+    }
+
+    function originFor(rect, stageRect, index, total) {
+      const cx = rect.left - stageRect.left;
+      const cy = rect.top - stageRect.top + rect.height / 2;
+      if (cfg.origin === "width") {
+        return { x: cx + Math.random() * rect.width, y: cy, edge: 0 };
+      }
+      if (cfg.origin === "edges") {
+        const left = index % 2 === 0;
+        const inset = Math.min(28, rect.width * 0.12);
+        return { x: left ? cx + inset : cx + rect.width - inset, y: cy, edge: left ? -1 : 1 };
+      }
+      return { x: cx + rect.width / 2, y: cy, edge: 0 };
+    }
+
+    function spawn(seed) {
+      if (particles.length >= HARD_CAP) return;
+      const size = cfg.size;
+      const el = acquireEl();
+      el.src = seed.src;
+      el.style.width = size + "px";
+      el.style.height = size + "px";
+
+      let vx, vy;
+      if (cfg.reducedMotion) {
+        const a = Math.random() * Math.PI * 2;
+        const r = 0.6 + Math.random() * 0.9;
+        vx = Math.cos(a) * r;
+        vy = Math.sin(a) * r;
+      } else {
+        const cone = cfg.spread + (180 - cfg.spread) * cfg.direction;
+        const ang = ((-90 + (Math.random() * 2 - 1) * cone) * Math.PI) / 180;
+        const speed = cfg.power * (0.65 + Math.random() * 0.8);
+        vx = Math.cos(ang) * speed + seed.edge * cfg.power * 0.25;
+        vy = Math.sin(ang) * speed;
+      }
+
+      particles.push({
+        el,
+        x: seed.x - size / 2,
+        y: seed.y - size / 2,
+        vx,
+        vy,
+        rot: Math.random() * 360,
+        vrot: (Math.random() * 2 - 1) * cfg.rotSpeed,
+        size,
+        life: cfg.life / FRAME,
+        life0: cfg.life / FRAME,
+      });
+    }
+
+    function step(ts) {
+      let dt = lastTs ? (ts - lastTs) / FRAME : 1;
+      lastTs = ts;
+      if (dt > 3) dt = 3;
+
+      while (pending.length && pending[0].at <= ts) spawn(pending.shift());
+
+      const H = stage.clientHeight;
+      const W = stage.clientWidth;
+      const gravity = cfg.reducedMotion ? 0 : cfg.gravity;
+      const dragFactor = cfg.reducedMotion ? 0.94 : Math.pow(1 - cfg.drag, dt);
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.vy += gravity * dt;
+        p.vx *= dragFactor;
+        p.vy *= dragFactor;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.rot += p.vrot * dt;
+        p.life -= dt;
+
+        if (
+          p.life <= 0 ||
+          p.y > H + p.size * 2.5 ||
+          p.y < -H ||
+          p.x < -p.size * 3 ||
+          p.x > W + p.size * 3
+        ) {
+          releaseEl(p.el);
+          particles.splice(i, 1);
+          continue;
+        }
+
+        const fadeWindow = p.life0 * cfg.fadeAt;
+        const fade = p.life < fadeWindow ? Math.max(0, p.life / fadeWindow) : 1;
+        p.el.style.opacity = String(fade);
+        p.el.style.transform =
+          "translate(" + p.x.toFixed(2) + "px, " + p.y.toFixed(2) + "px) rotate(" + p.rot.toFixed(1) + "deg)";
+      }
+
+      counter.textContent = particles.length + " particles";
+
+      if (particles.length || pending.length) {
+        raf = requestAnimationFrame(step);
+      } else {
+        raf = 0;
+        lastTs = 0;
+      }
+    }
+
+    function burst() {
+      const stageRect = stage.getBoundingClientRect();
+      const rect = cta.getBoundingClientRect();
+      const total = Math.min(cfg.count, HARD_CAP);
+      const now = performance.now();
+      const stagger = cfg.reducedMotion ? 0 : cfg.stagger;
+
+      for (let i = 0; i < total; i++) {
+        const o = originFor(rect, stageRect, i, total);
+        pending.push({
+          x: o.x,
+          y: o.y,
+          edge: o.edge,
+          src: ICON[i % 2 === 0 ? cfg.assetFrom : cfg.assetTo],
+          at: now + (total > 1 ? (i / (total - 1)) * stagger : 0),
+        });
+      }
+
+      if (!cfg.reducedMotion && cfg.shake > 0 && typeof cta.animate === "function") {
+        const s = cfg.shake;
+        cta.animate(
+          [
+            { transform: "translate(0px, 0px) rotate(0deg)" },
+            { transform: "translate(" + s + "px, " + (-s * 0.6) + "px) rotate(-1.4deg)" },
+            { transform: "translate(" + -s + "px, " + s * 0.3 + "px) rotate(1.4deg)" },
+            { transform: "translate(" + s * 0.5 + "px, 0px) rotate(-0.6deg)" },
+            { transform: "translate(0px, 0px) rotate(0deg)" },
+          ],
+          { duration: 260, easing: "cubic-bezier(.36,.07,.19,.97)" }
+        );
+      }
+
+      if (!raf) {
+        lastTs = 0;
+        raf = requestAnimationFrame(step);
+      }
+    }
+
+    /* ---------- cta state ---------- */
+
+    function setDone() {
+      cta.dataset.state = "done";
+      ctaLabel.textContent = "Done";
+      $("amtTo").classList.remove("muted");
+    }
+
+    function resetCta() {
+      cta.dataset.state = "idle";
+      ctaLabel.textContent = "Swap";
+      $("amtTo").classList.add("muted");
+    }
+
+    function fire(replayFromIdle) {
+      if (replayFromIdle) resetCta();
+      requestAnimationFrame(() => {
+        setDone();
+        burst();
+      });
+    }
+
+    cta.addEventListener("click", () => fire(cta.dataset.state === "done"));
+    $("replay").addEventListener("click", () => fire(true));
+    $("reset").addEventListener("click", resetCta);
+
+    /* ---------- reduced motion ---------- */
+
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    function applyReduced(on) {
+      cfg.reducedMotion = on;
+      reducedBox.checked = on;
+      document.body.dataset.reduced = String(on);
+    }
+    applyReduced(mq.matches);
+    reducedBox.addEventListener("change", () => applyReduced(reducedBox.checked));
+    mq.addEventListener("change", (e) => applyReduced(e.matches));
+
+    /* ---------- auto replay ---------- */
+
+    let autoId = 0;
+    $("auto").addEventListener("change", (e) => {
+      clearInterval(autoId);
+      if (e.target.checked) autoId = setInterval(() => fire(true), 2500);
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) lastTs = 0;
+    });
+
+    syncControls();
+  })();
+</script>
+</body>
+</html>
